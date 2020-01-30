@@ -14,7 +14,7 @@ mod mock;
 mod tests;
 
 // We have to import a few things
-use rstd::{prelude::*};
+use rstd::{prelude::*, fmt::Debug, marker::PhantomData};
 use primitives::crypto::KeyTypeId;
 use support::{decl_module, decl_storage, decl_event, dispatch,
   debug, traits::Get};
@@ -24,11 +24,13 @@ use simple_json::{self, json::JsonValue};
 use runtime_io::{self, misc::print_utf8 as print_bytes};
 #[cfg(not(feature = "std"))]
 use num_traits::float::FloatCore;
-use codec::Encode;
+use codec::{Encode, Decode, Codec};
 use sp_runtime::{
   offchain::http,
+  traits::SignedExtension,
   transaction_validity::{
-    TransactionValidity, TransactionLongevity, ValidTransaction, InvalidTransaction
+    TransactionValidity, TransactionLongevity, ValidTransaction, InvalidTransaction,
+    TransactionValidityError
   }
 };
 
@@ -326,10 +328,35 @@ impl<T: Trait> Module<T> {
   }
 }
 
-impl<T: Trait> support::unsigned::ValidateUnsigned for Module<T> {
-  type Call = Call<T>;
+#[derive(Encode, Decode, Clone, Eq, PartialEq)]
+pub struct OffchainTxs<T: Trait + Send + Sync>(PhantomData<T>);
 
-  fn validate_unsigned(call: &Self::Call) -> TransactionValidity {
+impl<T: Trait + Send + Sync> Debug for OffchainTxs<T> {
+  #[cfg(feature = "std")]
+  fn fmt(&self, f: &mut rstd::fmt::Formatter) -> rstd::fmt::Result {
+    write!(f, "OffchainTxs")
+  }
+
+  #[cfg(not(feature = "std"))]
+  fn fmt(&self, _: &mut rstd::fmt::Formatter) -> rstd::fmt::Result {
+    Ok(())
+  }
+}
+
+impl<T: Trait + Send + Sync> SignedExtension for OffchainTxs<T> {
+  type AccountId = T::AccountId;
+  type Call = <T as Trait>::Call;
+  type AdditionalSigned = ();
+  type DispatchInfo = support::weights::DispatchInfo;
+  type Pre = ();
+
+  fn additional_signed(&self) ->
+    core::result::Result<Self::AdditionalSigned, TransactionValidityError> {
+    Ok(())
+  }
+
+  fn validate_unsigned(call: &Self::Call, _info: Self::DispatchInfo, _len: usize) ->
+    TransactionValidity {
 
     match call {
       Call::record_price(block, (sym, remote_src, ..), price) => Ok(ValidTransaction {
@@ -339,7 +366,7 @@ impl<T: Trait> support::unsigned::ValidateUnsigned for Module<T> {
         longevity: TransactionLongevity::max_value(),
         propagate: true,
       }),
-      Call::record_agg_pp(block, sym, price) => Ok(ValidTransaction {
+      Self::Call::record_agg_pp(block, sym, price) => Ok(ValidTransaction {
         priority: 0,
         requires: vec![],
         provides: vec![(block, sym, price).encode()],

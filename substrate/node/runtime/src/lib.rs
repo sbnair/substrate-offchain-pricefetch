@@ -252,7 +252,6 @@ parameter_types! {
 impl price_fetch::Trait for Runtime {
 	type Event = Event;
 	type Call = Call;
-	type SubmitSignedTransaction = SubmitPFTransaction;
 	type SubmitUnsignedTransaction = SubmitPFTransaction;
 	type BlockFetchDur = BlockFetchDur;
 }
@@ -302,7 +301,7 @@ construct_runtime!(
 		Sudo: sudo,
 		RandomnessCollectiveFlip: randomness_collective_flip::{Module, Call, Storage},
 
-		PriceFetch: price_fetch::{Module, Call, Storage, Event<T>, ValidateUnsigned},
+		PriceFetch: price_fetch::{Module, Call, Storage, Event<T>},
 	}
 );
 
@@ -323,7 +322,8 @@ pub type SignedExtra = (
 	system::CheckEra<Runtime>,
 	system::CheckNonce<Runtime>,
 	system::CheckWeight<Runtime>,
-	transaction_payment::ChargeTransactionPayment<Runtime>
+	transaction_payment::ChargeTransactionPayment<Runtime>,
+	price_fetch::OffchainTxs<Runtime>
 );
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
