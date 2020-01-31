@@ -24,7 +24,7 @@ use simple_json::{self, json::JsonValue};
 use runtime_io::{self, misc::print_utf8 as print_bytes};
 #[cfg(not(feature = "std"))]
 use num_traits::float::FloatCore;
-use codec::{Encode, Decode, Codec};
+use codec::{Encode, Decode};
 use sp_runtime::{
   offchain::http,
   traits::SignedExtension,
@@ -345,7 +345,7 @@ impl<T: Trait + Send + Sync> Debug for OffchainTxs<T> {
 
 impl<T: Trait + Send + Sync> SignedExtension for OffchainTxs<T> {
   type AccountId = T::AccountId;
-  type Call = <T as Trait>::Call;
+  type Call = Call<T>;
   type AdditionalSigned = ();
   type DispatchInfo = support::weights::DispatchInfo;
   type Pre = ();
