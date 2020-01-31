@@ -263,14 +263,6 @@ impl<T: Trait> Module<T> {
     // Unsigned tx
     T::SubmitUnsignedTransaction::submit_unsigned(call)
       .map_err(|_| "fetch_price: submit_unsigned(call) error")
-
-    // Signed tx
-    // let local_accts = T::SubmitTransaction::find_local_keys(None);
-    // let (local_acct, local_key) = local_accts[0];
-    // debug::info!("acct: {:?}", local_acct);
-    // T::SignAndSubmitTransaction::sign_and_submit(call, local_key);
-
-    // T::SubmitSignedTransaction::submit_signed(call);
   }
 
   fn vecchars_to_vecbytes<I: IntoIterator<Item = char> + Clone>(it: &I) -> Vec<u8> {
@@ -321,10 +313,6 @@ impl<T: Trait> Module<T> {
     // Unsigned tx
     T::SubmitUnsignedTransaction::submit_unsigned(call)
       .map_err(|_| "aggregate_pp: submit_signed(call) error")
-
-    // Signed tx
-    // T::SubmitSignedTransaction::submit_signed(call);
-    // Ok(())
   }
 }
 
