@@ -3,11 +3,11 @@
 use crate::{Module, Trait};
 use primitives::{H256};
 
-use support::{dispatch, impl_outer_origin, impl_outer_dispatch,
+use support::{/* dispatch, */impl_outer_origin, impl_outer_dispatch,
   parameter_types, weights::Weight};
 
 use sp_runtime::{
-  app_crypto::{AppPublic, RuntimeAppPublic},
+  // app_crypto::{AppPublic, RuntimeAppPublic},
   traits::{BlakeTwo256, IdentityLookup},
   testing::{Header, TestXt},
   Perbill
@@ -52,15 +52,15 @@ mod sp_core_crypto_dummy {
       vec![Dummy]
     }
 
-    fn generate_pair(key_type: KeyTypeId, seed: Option<Vec<u8>>) -> Self {
+    fn generate_pair(_key_type: KeyTypeId, _seed: Option<Vec<u8>>) -> Self {
       Dummy
     }
 
-    fn sign<M: AsRef<[u8]>>(&self, key_type: KeyTypeId, msg: &M) -> Option<Self::Signature> {
+    fn sign<M: AsRef<[u8]>>(&self, _key_type: KeyTypeId, _msg: &M) -> Option<Self::Signature> {
       Some(self.clone())
     }
 
-    fn verify<M: AsRef<[u8]>>(&self, msg: &M, signature: &Self::Signature) -> bool {
+    fn verify<M: AsRef<[u8]>>(&self, _msg: &M, _signature: &Self::Signature) -> bool {
       true
     }
   }

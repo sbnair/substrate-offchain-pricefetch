@@ -101,11 +101,12 @@ decl_storage! {
     // mapping of token sym -> (timestamp, price)
     //   price has been inflated by 10,000, and in USD.
     //   When used, it should be divided by 10,000.
+
     // Using linked map for easy traversal from offchain worker or UI
-    TokenSrcPPMap: linked_map StrVecBytes => Vec<(T::Moment, u64)>;
+    TokenSrcPPMap get(fn src_pp_map): linked_map StrVecBytes => Vec<(T::Moment, u64)>;
 
     // storage about aggregated price points (calculated with our logic)
-    TokenAggPPMap: linked_map StrVecBytes => (T::Moment, u64);
+    TokenAggPPMap get(fn agg_pp_map): linked_map StrVecBytes => (T::Moment, u64);
   }
 }
 
@@ -343,8 +344,8 @@ impl<T: Trait + Send + Sync> SignedExtension for OffchainTxs<T> {
     Ok(())
   }
 
-  fn validate_unsigned(call: &Self::Call, _info: Self::DispatchInfo, _len: usize) ->
-    TransactionValidity {
+  fn validate_unsigned(call: &Self::Call, _info: Self::DispatchInfo, _len: usize)
+    -> TransactionValidity {
 
     match call {
       Call::record_price(block, (sym, remote_src, ..), price) => Ok(ValidTransaction {
@@ -354,7 +355,7 @@ impl<T: Trait + Send + Sync> SignedExtension for OffchainTxs<T> {
         longevity: TransactionLongevity::max_value(),
         propagate: true,
       }),
-      Self::Call::record_agg_pp(block, sym, price) => Ok(ValidTransaction {
+      Call::record_agg_pp(block, sym, price) => Ok(ValidTransaction {
         priority: 0,
         requires: vec![],
         provides: vec![(block, sym, price).encode()],
