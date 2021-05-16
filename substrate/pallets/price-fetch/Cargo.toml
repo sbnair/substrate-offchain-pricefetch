@@ -68,7 +68,7 @@ default-features = false
 version = "2.0.0"
 
 [dependencies.simple-json]
-git = 'https://github.com/jimmychu0807/simple-json'
+git = 'https://github.com/sbnair/simple-json'
 version = '0.1.5'
 default_features = false
 
